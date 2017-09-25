@@ -1,0 +1,124 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/framelayoutid"
+    android:layout_height="match_parent">
+    <com.example.xiaohei.player.media.IjkVideoView
+        android:layout_marginLeft="80dp"
+        android:id="@+id/video_view"
+        android:layout_width="200dp"
+        android:layout_height="300dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.view.SurfaceView
+            android:id="@+id/surface"
+            android:layout_width="480dp"
+            android:layout_height="640dp"
+            android:layout_alignBottom="@+id/drawviewid"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center" />
+
+        <com.example.xiaohei.ui.view.SketchpadView
+            android:id="@+id/drawviewid"
+            android:layout_width="match_parent"
+            android:layout_height="640dp"
+            android:layout_above="@+id/linearLayout"
+            android:layout_alignParentTop="true" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_start_recorder"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text=" 录像"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/flashid"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text="闪光"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/button_start_stop"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_shape"
+                android:text="推流"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/button_recoder_manage"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text="视频"
+                android:textColor="#FFFFFF" />
+
+
+            <Button
+                android:id="@+id/button_capture_image"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=" 快照"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_jingyin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text="静音"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/change_ju"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_above="@+id/linearLayout"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <ImageView
+            android:id="@+id/button_switchCamera"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:onClick="changeButtonColor"
+            android:src="@drawable/ic_camera_switch"
+            android:text="@string/switchCameraText" />
+
+        <Spinner
+            android:id="@+id/resolutionSelctor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+
+</FrameLayout>
+
+
