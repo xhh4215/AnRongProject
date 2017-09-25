@@ -27,21 +27,29 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
+    //日志打印标识
     private String TAG = "LoginActivity";
-    //可清除的文本编辑框
+    //输入服务端的url的文本框
     private ClearEditText mLoginUrl;
     //服务器的url
     public String mUrl;
     //phoneid
     public String mLogin;
+    //登陆用户的id
     private ClearEditText mLoginId;
     //登陆按钮
     private Button mLoginBtn;
+    //与服务端进行socket连接的对象
     private ClientAction mClientAction;
-    private Button mButtonPull;
+    //终端接收的指令的来源 服务端/指挥端
     int commandType;
+    //具体的做什么的指令
     int messageType;
+    //用来解析json字符串的工具类
     public Gson gson;
+    //服务器返回的推送的视频的地址
+    public String PushUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +65,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mLogin = mLoginId.getText().toString();
         mLoginBtn = ((Button) findViewById(R.id.login_btn));
         mLoginBtn.setOnClickListener(this);
-        mButtonPull = (Button) findViewById(R.id.pull_btn);
     }
 
     //activity重新回到栈顶运行的时候回调的方法
@@ -83,7 +90,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
      * 标识是否是登陆状态的boolean变量
      */
     private boolean isLogin = false;
-    private boolean isPull = false;
+
     //处理EventBus推送回来的连接成功时候返回的标识 mLogin 2
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 100)
     public void getStrings(final LoginEvent loginEvent) {
@@ -92,30 +99,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void run() {
                 isLogin = true;
                 Toast.makeText(LoginActivity.this, "连接成功" + loginEvent.getPhoneid(), Toast.LENGTH_SHORT).show();
-                if (loginEvent.getPhoneid().equals("startpush")) {
+                 PushUrl = "rtmp://192.168.1.22:1935/live/stream2";
+                //登陆成功跳转到主界面
+                Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
+                intent.putExtra("pushurl",PushUrl);
+                startActivity(intent);
+                finish();
 
-                } else {
-                    //登陆成功跳转到主界面
-                    Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
-                    intent.putExtra("url", mUrl);
-                    intent.putExtra("id", mLogin);
-                    startActivity(intent);
-                    finish();
-                }
             }
         });
     }
-   @Subscribe(threadMode = ThreadMode.MAIN,priority = 98)
-   public void getPullurl(final PullEvent event){
-       runOnUiThread(new Runnable() {
-           @Override
-           public void run() {
-               isPull = true;
-               //播放指定的url的视频
 
-           }
-       });
-   }
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -161,37 +155,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }
                 }, 3000);
                 break;
-            case R.id.pull_btn:
-                MyApplication.isVisitor = false;
-                mClientAction = MyApplication.getmClientAction();
-                //启动socket管理的线程
-                mClientAction.start();
-                //封装登陆发送的数据
-                BaseServiceData sendpull = new BaseServiceData();
-                commandType = MyEnum.CommandType.COMMAND_BEGIN_PULL.ordinal();
-                messageType = MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal();
-                sendpull.setMsgCom(commandType);
-                sendpull.setMsgType(messageType);
-                sendpull.setVideoUrl("pull urll");
-                //对象转化为json字符串
-                gson = new Gson();
-                final String jsonsendpull = gson.toJson(sendpull) + "\n";
-                mClientAction.sendData(jsonsendpull);
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (!isPull) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LoginActivity.this, "拉取失败", Toast.LENGTH_SHORT).show();
-                                    //startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                }
-                            });
-                        }
-                    }
-                }, 3000);
-
         }
     }
 }

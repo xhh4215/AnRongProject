@@ -60,11 +60,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class VideoActivity extends Activity implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    //打印日志的标识符
     private static String TAG = "SmartPublisher";
-
+    //初始化音频处理对象
     NTAudioRecord audioRecord_ = null;    //for audio capture
+    //视频推流的对象
     private SmartPublisherJni libPublisher = null;
+    //打开闪关灯的按钮
     private Button btnOpenFlash;
+    //设置推动的类型  音频  视频  视频和音频
     private int pushType = 0;
     /* 推流分辨率选择
      * 0: 640*480
@@ -80,27 +84,31 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
      * 3: high profile
      * */
     private int sw_video_encoder_profile = 2;    //default with baseline profile
+    //视频管理的按钮
     private Button btnRecoderMgr;
+    //切换摄像头的图片
     private ImageView imgSwitchCamera;
+    //开始推流的按钮
     private Button btnStartStop;
-    private Button btnStartPush;
-    FrameLayout framelayout;
+    //进行本地录制的视频的按钮
     private Button btnStartRecorder;
     private Button btnCaptureImage;
+    //视频的显示控件
     private SurfaceView mSurfaceView = null;
+    //视频绘制图形的自定义控件
     private SurfaceHolder mSurfaceHolder = null;
+    //录制视频的相机控件
     private Camera mCamera = null;
+    //进行自动对焦的监听事件
     private Camera.AutoFocusCallback myAutoFocusCallback = null;
     private boolean mPreviewRunning = false;
     private boolean isStart = false;
     private boolean isPushing = false;
     private boolean isRecording = false;
     private String publishURL;
-    final private String baseURL = "rtmp://192.168.1.22:1935/live/stream2";
-    private String inputPushURL = "";
+    private String baseURL;
     private String printText = "URL:";
     private String txt = "当前状态";
-
     private static final int FRONT = 1;        //前置摄像头标记
     private static final int BACK = 2;        //后置摄像头标记
     private int currentCameraType = BACK;    //当前打开的摄像头标记
@@ -109,19 +117,19 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private int currentOrigentation = PORTRAIT;
     private int curCameraIndex = -1;
     private int openId = 0;
-    private int changeId = 0;
     private int videoWidth = 640;
     private int videoHight = 480;
-
     private int frameCount = 0;
     private String recDir = "/sdcard/daniulive/rec";    //for recorder path
     private int sw_video_encoder_speed = 6;
+    //进行视频播放的对象
     private PlayerManager player;
     private boolean is_hardware_encoder = false;
     private Context myContext;
-    private SeekBar btnChangeJu;
+    private SeekBar btnChangeJu;//改变焦距的控件
     private String imageSavePath;
-    private SketchpadView mSketchpadView;
+    private SketchpadView mSketchpadView;//图形绘制的控件
+    //双向视频拉取视频的地址
     private String url1 = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
     static {
         System.loadLibrary("SmartPublisher");
@@ -187,10 +195,10 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         btnOpenFlash.setOnClickListener(new OpenFlashListener());
         imgSwitchCamera = (ImageView) findViewById(R.id.button_switchCamera);
         imgSwitchCamera.setOnClickListener(new SwitchCameraListener());
-        framelayout= (FrameLayout) findViewById(R.id.framelayoutid);
         mSurfaceView = (SurfaceView) this.findViewById(R.id.surface);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
+        getDataFromLogin();
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         //自动聚焦变量回调
         myAutoFocusCallback = new Camera.AutoFocusCallback() {
@@ -208,7 +216,12 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         player = new PlayerManager(this);
         player.play(url1);
     }
-
+        //用来处理登陆的界面传递过来的数据
+    private void getDataFromLogin() {
+        //获取视频推送的地址
+        Intent intent  = getIntent();
+        baseURL = intent.getStringExtra("pushurl");
+    }
 
 
     class MySeekBarListener implements SeekBar.OnSeekBarChangeListener {
@@ -586,74 +599,6 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
 
         libPublisher.SmartPublisherSaveImageFlag(1);
     }
-
-    class ButtonStartPushListener implements View.OnClickListener {
-        public void onClick(View v) {
-            if (isStart) {
-                return;
-            }
-
-            if (isPushing) {
-                stopPush();
-
-                if (!isRecording) {
-                    ConfigControlEnable(true);
-                }
-
-                btnStartPush.setText(" 推送");
-
-                isPushing = false;
-
-                return;
-            }
-
-
-            Log.i(TAG, "onClick start push..");
-
-            if (libPublisher == null)
-                return;
-
-            isPushing = true;
-
-            if (!isRecording) {
-                InitAndSetConfig();
-            }
-
-            if (inputPushURL != null && inputPushURL.length() > 1) {
-                publishURL = inputPushURL;
-                Log.i(TAG, "start, input publish url:" + publishURL);
-            }
-
-            printText = "URL:" + publishURL;
-
-            Log.i(TAG, printText);
-
-            if (libPublisher.SmartPublisherSetURL(publishURL) != 0) {
-                Log.e(TAG, "Failed to set publish stream URL..");
-            }
-
-            int startRet = libPublisher.SmartPublisherStartPublisher();
-            if (startRet != 0) {
-                isPushing = false;
-
-                Log.e(TAG, "Failed to start push stream..");
-                return;
-            }
-
-            if (!isRecording) {
-                if (pushType == 0 || pushType == 1) {
-                    CheckInitAudioRecorder();    //enable pure video publisher..
-                }
-            }
-
-            if (!isRecording) {
-                ConfigControlEnable(false);
-            }
-            btnStartPush.setText(" 停止推送 ");
-        }
-
-    }
-
     class ButtonStartRecorderListener implements View.OnClickListener {
         public void onClick(View v) {
             if (isStart) {
