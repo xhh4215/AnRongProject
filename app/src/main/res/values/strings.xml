@@ -1,20 +1,5 @@
 <resources>
     <string name="app_name">SmartPublisherSDKDemo</string>
-
-    <array name="titleArray">
-        <item>主页</item>
-        <item>工作</item>
-        <item>应用</item>
-        <item>我</item>
-    </array>
-
-    <array name="exampleOneArray">
-        <item>微信</item>
-        <item>通讯录</item>
-        <item>发现</item>
-        <item>我</item>
-    </array>
-
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="copyright">Copyright 2014~2016 www.daniulive.com v1.0.16.0921</string>
@@ -29,4 +14,8 @@
     <string name="thick">极粗</string>
     <string name="thin">笔迹宽度</string>
     <string name="qq_qun">QQ群:294891451,  499687479</string>
+    <string name="skin_tabbar_icon_auth">视频</string>
+    <string name="skin_tabbar_icon_at">应用</string>
+    <string name="skin_tabbar_icon_space">设置</string>
+    <string name="skin_tabbar_icon_more">玩吧</string>
 </resources>
