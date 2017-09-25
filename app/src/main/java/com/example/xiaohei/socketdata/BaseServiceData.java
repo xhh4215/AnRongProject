@@ -47,9 +47,19 @@ public class BaseServiceData implements Serializable {
     public void setRPoint_y(double RPoint_y) {
         this.RPoint_y = RPoint_y;
     }
+    //视频会商的地址
+    public String discussUrl;
+
+    public String getDiscussUrl() {
+        return discussUrl;
+    }
+
+    public void setDiscussUrl(String discussUrl) {
+        this.discussUrl = discussUrl;
+    }
 
     //是否打开闪光的标识符
-    public int openFlash;
+
     //登陆的用户id
     public String PhoneId;
     //发送的指令的类型 登陆 绘图。。。。
@@ -89,14 +99,6 @@ public class BaseServiceData implements Serializable {
 
     public void setPhoneId(String phoneId) {
         this.PhoneId = phoneId;
-    }
-
-    public int getOpenFlash() {
-        return openFlash;
-    }
-
-    public void setOpenFlash(int openFlash) {
-        this.openFlash = openFlash;
     }
 
 

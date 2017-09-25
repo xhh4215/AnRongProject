@@ -85,76 +85,58 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             EventBus.getDefault().unregister(this);
         }
     }
-
-    /**
-     * 标识是否是登陆状态的boolean变量
-     */
-    private boolean isLogin = false;
-
     //处理EventBus推送回来的连接成功时候返回的标识 mLogin 2
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 100)
-    public void getStrings(final LoginEvent loginEvent) {
+    public void logSuccess(final LoginEvent loginEvent) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                isLogin = true;
-                Toast.makeText(LoginActivity.this, "连接成功" + loginEvent.getPhoneid(), Toast.LENGTH_SHORT).show();
-                 PushUrl = "rtmp://192.168.1.22:1935/live/stream2";
+                Toast.makeText(LoginActivity.this, "连接成功" + loginEvent.getPhoneid()+loginEvent.what+"发来的消息", Toast.LENGTH_SHORT).show();
+                PushUrl = "rtmp://192.168.1.22:1935/live/stream2";
                 //登陆成功跳转到主界面
                 Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
-                intent.putExtra("pushurl",PushUrl);
+                intent.putExtra("pushurl", PushUrl);
                 startActivity(intent);
                 finish();
 
             }
         });
     }
-
+     @Subscribe(threadMode = ThreadMode.MAIN,priority = 99)
+     public void logFail(final LoginEvent loginEvent){
+         runOnUiThread(new Runnable() {
+             @Override
+             public void run() {
+                 Toast.makeText(LoginActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                 //登陆失败的后续处理
+                 finish();
+             }
+         });
+     }
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.login_btn:
-                MyApplication.isVisitor = false;
-                String ip = mLoginUrl.getText().toString();
-                if (TextUtils.isEmpty(ip)) {
-                    ToastUtil.makeToastShort("ip地址不能是空");
-                    return;
-                }
-                //初始化socket管理类
-//                MyApplication.newClientAction(ip);
-                mClientAction = MyApplication.getmClientAction();
-                //启动socket管理的线程
-                mClientAction.start();
-                //封装登陆发送的数据
-                BaseServiceData sendLogon = new BaseServiceData();
-                commandType = MyEnum.CommandType.COMMAND_CONNECT_SUCESS.ordinal();
-                messageType = MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal();
-                //sendLogon.setCommandType(SendService.CommandType.COMMAND_CONNECT_SUCESS);
-                //sendLogon.setMessageType(SendService.MessageType.MESSAGE_PHONEMSG);
-                sendLogon.setMsgCom(commandType);
-                sendLogon.setMsgType(messageType);
-                sendLogon.setPhoneId(mLoginId.getText().toString());
-                //对象转化为json字符串
-                gson = new Gson();
-                final String jsonLongon = gson.toJson(sendLogon) + "\n";
-                Log.d(TAG, jsonLongon);
-                mClientAction.sendData(jsonLongon);
-                //发送数据到服务器
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (!isLogin) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LoginActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-                                    //startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                }
-                            });
-                        }
-                    }
-                }, 3000);
-                break;
+        MyApplication.isVisitor = false;
+        String ip = mLoginUrl.getText().toString();
+        if (TextUtils.isEmpty(ip)) {
+            ToastUtil.makeToastShort("ip地址不能是空");
+            return;
         }
+        //初始化socket管理类
+        mClientAction = MyApplication.getmClientAction();
+        //启动socket管理的线程
+        mClientAction.start();
+        //封装登陆发送的数据
+        BaseServiceData sendLogon = new BaseServiceData();
+        commandType = MyEnum.CommandType.COMMAND_CLIENT_ONLINE.ordinal();
+        messageType = MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal();
+        sendLogon.setMsgCom(commandType);
+        sendLogon.setMsgType(messageType);
+        sendLogon.setPhoneId(mLoginId.getText().toString());
+        //对象转化为json字符串
+        gson = new Gson();
+        final String jsonLongon = gson.toJson(sendLogon) + "\n";
+        Log.d(TAG, jsonLongon);
+        mClientAction.sendData(jsonLongon); //发送数据到服务器
+
     }
 }

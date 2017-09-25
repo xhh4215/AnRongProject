@@ -1,23 +1,15 @@
 package com.example.xiaohei.socket;
 
 import android.util.Log;
-import android.widget.Toast;
 
 
 import com.example.xiaohei.context.Config;
 import com.example.xiaohei.context.EventConfig;
-import com.example.xiaohei.context.MyApplication;
-import com.example.xiaohei.enumpackage.MyEnum;
-import com.example.xiaohei.event.FlashEvent;
 import com.example.xiaohei.event.InformationEvent;
-import com.example.xiaohei.event.PullEvent;
-import com.example.xiaohei.paintview.Flash;
 import com.example.xiaohei.paintview.Point;
 import com.example.xiaohei.socketdata.BaseServiceData;
-import com.example.xiaohei.socketdata.SendService;
 import com.example.xiaohei.event.LoginEvent;
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -44,6 +36,8 @@ public class ClientAction extends Thread {
 
     private String ip;
     private int port = 0;
+    private int type;
+    private int message;
 
     public ClientAction(String ip, int port) {
         this.port = port;
@@ -58,7 +52,7 @@ public class ClientAction extends Thread {
         try {
             Socket socket;
             if (port == 0) {
-                socket = new Socket(ip,Config.PORT);
+                socket = new Socket(ip, Config.PORT);
             } else {
                 socket = new Socket(ip, port);
             }
@@ -82,31 +76,51 @@ public class ClientAction extends Thread {
                     BaseServiceData receiveData = gson.fromJson(jsonreceiveData, BaseServiceData.class);
                     switch (receiveData.getMsgCom()) {
                         //客户端连接成功接收到的服务器的返回的连接成功的标识
-                        case EventConfig.LGOIN:
-                            int type1 = receiveData.getMsgCom();
+                        case EventConfig.LGOIN_SUCCESS:
+                            //获取消息类型判断是服务端消息还是指挥端消息
+                            type = receiveData.getMsgType();
                             String phoneId = receiveData.getPhoneId();
-                            EventBus.getDefault().post(new LoginEvent(phoneId, type1));
+                            EventBus.getDefault().post(new LoginEvent(phoneId, type));
+                            //此处应该添加获取推送地址的代码
                             break;
+                        //登陆失败的处理
+                        case EventConfig.LOGIN_FAILE:
+                            type = receiveData.getMsgType();
+                            message = receiveData.getMsgCom();
+                            EventBus.getDefault().post(new LoginEvent("" + message, type));
+                            break;
+                        //视频标绘的处理
                         case EventConfig.POINT:
-                            int type2 = receiveData.getMsgCom();
+                            type = receiveData.getMsgType();
                             double onePointx = receiveData.getLPoint_x();
                             double onePointy = receiveData.getLPoint_y();
                             double twoPointx = receiveData.getRPoint_x();
                             double twoPointy = receiveData.getRPoint_y();
                             Point point = new Point(onePointx, onePointy, twoPointx, twoPointy);
-                            EventBus.getDefault().post(new InformationEvent(point, type2));
+                            EventBus.getDefault().post(new InformationEvent(point, type));
                             break;
+                        //闪光灯的处理
                         case EventConfig.FlASH:
-                            int type3 = receiveData.getMsgCom();
-                            int openFlash = receiveData.getOpenFlash();
-                            Flash flash = new Flash(openFlash);
-                            String open = flash.getOpen();
-                            EventBus.getDefault().post(new FlashEvent(open, type3));
+                            type = receiveData.getMsgType();
+                            int open = receiveData.getMsgCom();
+                            EventBus.getDefault().post(new InformationEvent(open, type));
                             break;
-                        case EventConfig.BEGIN_PULL:
-                            int type4 = receiveData.getMsgCom();
-                            String pullurl = receiveData.getPhoneId();
-                            EventBus.getDefault().post(new PullEvent(pullurl,type4));
+                        //视频会商的处理
+                        case EventConfig.VIDEO_DISCUSS:
+                            type = receiveData.getMsgType();
+                            String discussurl = receiveData.getDiscussUrl();
+                            EventBus.getDefault().post(new InformationEvent(discussurl, type));
+                        //增大焦距
+                        case EventConfig.FOCUSING_UP:
+                            type = receiveData.getMsgType();
+                            message = receiveData.getMsgCom();
+                            EventBus.getDefault().post(new InformationEvent(message, type));
+                            break;
+                        //减小焦距
+                        case EventConfig.FOCUSING_DOWN:
+                            type = receiveData.getMsgType();
+                            message = receiveData.getMsgCom();
+                            EventBus.getDefault().post(new InformationEvent(message, type));
                             break;
                     }
                 } catch (Exception e) {

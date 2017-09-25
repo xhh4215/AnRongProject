@@ -20,7 +20,6 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -34,11 +33,8 @@ import com.example.xiaohei.context.MyApplication;
 import com.example.xiaohei.enumpackage.MyEnum;
 import com.example.xiaohei.event.InformationEvent;
 import com.example.xiaohei.manager.PlayerManager;
-import com.example.xiaohei.paintview.Flash;
 import com.example.xiaohei.paintview.Point;
 
-import com.example.xiaohei.player.media.IjkVideoView;
-import com.example.xiaohei.player.media.SurfaceRenderView;
 import com.example.xiaohei.socketdata.BaseServiceData;
 
 import com.example.xiaohei.ui.view.SketchpadView;
@@ -84,6 +80,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
      * 3: high profile
      * */
     private int sw_video_encoder_profile = 2;    //default with baseline profile
+    public int message;
     //视频管理的按钮
     private Button btnRecoderMgr;
     //切换摄像头的图片
@@ -131,6 +128,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private SketchpadView mSketchpadView;//图形绘制的控件
     //双向视频拉取视频的地址
     private String url1 = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
+
     static {
         System.loadLibrary("SmartPublisher");
     }
@@ -214,12 +212,13 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
 
         libPublisher = new SmartPublisherJni();
         player = new PlayerManager(this);
-        player.play(url1);
+
     }
-        //用来处理登陆的界面传递过来的数据
+
+    //用来处理登陆的界面传递过来的数据
     private void getDataFromLogin() {
         //获取视频推送的地址
-        Intent intent  = getIntent();
+        Intent intent = getIntent();
         baseURL = intent.getStringExtra("pushurl");
     }
 
@@ -599,6 +598,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
 
         libPublisher.SmartPublisherSaveImageFlag(1);
     }
+
     class ButtonStartRecorderListener implements View.OnClickListener {
         public void onClick(View v) {
             if (isStart) {
@@ -1071,6 +1071,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         sketchpadView.setStrokeType(SketchpadView.STROKE_RECT);
         sketchpadView.setStrokeColor(Color.RED);
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 99)
     public void onPaint(final InformationEvent event) {
         runOnUiThread(new Runnable() {
@@ -1079,14 +1080,29 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                 try {
                     Object object = event.getObject();
                     switch (event.getWhat()) {
+                        //视频标绘
                         case EventConfig.POINT:
                             Point point = (Point) object;
                             handlePoint(point);
                             break;
-
+                        //闪光灯的处理
                         case EventConfig.FlASH:
-                            Flash flash = (Flash) object;
-                            handleFlash(flash, mCamera);
+                            message = (int) object;
+                            handleFlash(message, mCamera);
+                            break;
+                        //焦距变化处理逻辑
+                        case EventConfig.FOCUSING_DOWN:
+                            message = (int) object;
+                            handleFocusing(message,mCamera);
+                            break;
+                        case EventConfig.FOCUSING_UP:
+                            message = (int) object;
+                            handleFocusing(message,mCamera);
+                            break;
+                        case EventConfig.VIDEO_DISCUSS:
+                            //拉取视频的url
+                            String discussUrl = (String )object;
+                            handlePlayer(discussUrl,player);
                             break;
                     }
                 } catch (Exception e) {
@@ -1096,18 +1112,32 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         });
     }
+   //播放拉取的视频源
+    private void handlePlayer(String discussUrl, PlayerManager player) {
+        player.play(discussUrl);
+    }
 
-    private void handleFlash(Flash flash, Camera mCamera) {
-        String s = flash.getOpen();
-        if (s.equals("open")) {
-            try {
+    //message 是焦距每次变化的数值的大小
+    private void handleFocusing(int message, Camera mCamera) {
+        int progress1 = message / 10;
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setZoom(progress1);
+        mCamera.setParameters(parameters);
+    }
+
+    private void handleFlash(int message, Camera mCamera) {
+        if (message == MyEnum.CommandType.COMMAND_FLASHLIGHT.ordinal()) {
+            if (openId == 0) {
                 Camera.Parameters parameters = mCamera.getParameters();
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                 mCamera.setParameters(parameters);
-            } catch (Exception e) {
-                e.printStackTrace();
+                openId = 1;
+            } else {
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(parameters);
+                openId = 0;
             }
-
         }
     }
 

@@ -23,7 +23,8 @@ public class MyEnum {
      * - COMMAND_CLIENT_ONLINE,  //客户端上线
      * - COMMAND_CLIENT_OFFLINE //客户端下线
      */
-    public enum CommandType { COMMAND_CONNECT_SUCESS,//连接成功
+    public enum CommandType {
+        COMMAND_CONNECT_SUCESS,//连接成功
         COMMAND_CONNECT_FAIL,//连接失败
         COMMAND_BEGIN_PUSH,//开始推流
         COMMAND_END_PUSH,//结束推流
