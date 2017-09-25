@@ -126,6 +126,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private boolean is_hardware_encoder = false;
     private Context myContext;
     private SeekBar btnChangeJu;//改变焦距的控件
+    //屏幕快照存储的位置的字符串 使用屏幕快照的前提是开始推流
     private String imageSavePath;
     private SketchpadView mSketchpadView;//图形绘制的控件
 
@@ -1131,6 +1132,8 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             parameters.setZoom(progress);
             mCamera.setParameters(parameters);
         }
+
+
     //播放拉取的视频源
     private void handlePlayer(String discussUrl, PlayerManager player) {
             BaseServiceData startpull = getBaseServiceDate();
@@ -1141,6 +1144,8 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             MyApplication.getmClientAction().sendData(s);
             player.play(discussUrl);
         }
+
+
     //增加焦距
     private void handleFocusingUp(int message, Camera mCamera) {
             progress = progress+10;
@@ -1148,6 +1153,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             parameters.setZoom(message);
             mCamera.setParameters(parameters);
         }
+
    public  Gson getGson(){
        Gson gson = new Gson();
        return  gson;
@@ -1166,7 +1172,6 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                 openId = 0;
             }
         }
-    //视频标绘的处理
     private void handlePoint(Point point) {
         //获取android手机的屏幕的宽度和高度
         WindowManager wm = this.getWindowManager();
@@ -1201,6 +1206,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         }, 3000);
     }
+
     //activity重新回到栈顶运行的时候回调的方法
     @Override
     protected void onResume() {
@@ -1210,6 +1216,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             EventBus.getDefault().register(this);
         }
     }
+
     //activity处于暂停的时候的回调的方法
     @Override
     protected void onPause() {

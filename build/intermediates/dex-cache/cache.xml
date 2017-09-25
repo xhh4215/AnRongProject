@@ -3,30 +3,30 @@
 
     <item
         is-multidex="true"
-        jar="/Users/xhh/AndroidStudy/AnrongProject/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.0"
-        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
-        <dex dex="/Users/xhh/AndroidStudy/AnrongProject/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_731582efd1d2118b64ea29d15f3d34a0bac435d9/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/xhh/AndroidStudy/AnrongProject/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.0"
-        sha1="14c17c49c975b87727b95df9a76c0d04ee4a4e01">
-        <dex dex="/Users/xhh/AndroidStudy/AnrongProject/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_9474baa52579cd0140fb285146be0c8eb60842a6/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/Users/xhh/AndroidStudy/AnrongProject/pushlibrary/build/intermediates/bundles/default/libs/smartavengine.jar"
+        jar="/Users/xhh/AnRong/AnrongProject/pushlibrary/build/intermediates/bundles/default/libs/smartavengine.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
         sha1="99876a36c7b6b82d59ac27870a7f343debb2ddd7">
-        <dex dex="/Users/xhh/AndroidStudy/AnrongProject/app/build/intermediates/transforms/dex/debug/folders/1000/8/smartavengine_12c95fa1691b63f8abb5ec45789c91f9734a36ec/classes.dex" />
+        <dex dex="/Users/xhh/AnRong/AnrongProject/app/build/intermediates/transforms/dex/debug/folders/1000/8/smartavengine_e55f3042711aef11d07dd9374c8f0fb7a0af2954/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/xhh/AnRong/AnrongProject/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="/Users/xhh/AnRong/AnrongProject/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_fd232c79c859ba3ead7f87bf18088e1e186243c0/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/xhh/AnRong/AnrongProject/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="9a2b7b7b926cc3283c568ea9a886548f6dd7977a">
+        <dex dex="/Users/xhh/AnRong/AnrongProject/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_9a55f76a89ed21d8e2346ff96d09bf3cb8230bd2/classes.dex" />
     </item>
 
 </items>
