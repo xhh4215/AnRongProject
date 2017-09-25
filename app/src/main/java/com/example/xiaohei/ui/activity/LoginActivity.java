@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.xiaohei.R;
+import com.example.xiaohei.context.EventConfig;
 import com.example.xiaohei.context.MyApplication;
 import com.example.xiaohei.enumpackage.MyEnum;
 import com.example.xiaohei.event.PullEvent;
@@ -91,28 +92,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(LoginActivity.this, "连接成功" + loginEvent.getPhoneid()+loginEvent.what+"发来的消息", Toast.LENGTH_SHORT).show();
-                PushUrl = "rtmp://192.168.1.22:1935/live/stream2";
-                //登陆成功跳转到主界面
-                Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
-                intent.putExtra("pushurl", PushUrl);
-                startActivity(intent);
-                finish();
+                switch(loginEvent.getWhat()){
+                    case EventConfig.LGOIN_SUCCESS:
+                        Toast.makeText(LoginActivity.this, "连接成功" + loginEvent.getPhoneid()+loginEvent.what+"发来的消息", Toast.LENGTH_SHORT).show();
+                        PushUrl = "rtmp://192.168.1.22:1935/live/stream2";
+                        //登陆成功跳转到主界面
+                        Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
+                        intent.putExtra("pushurl", PushUrl);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    case EventConfig.LOGIN_FAILE:
+                        Toast.makeText(LoginActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });
     }
-     @Subscribe(threadMode = ThreadMode.MAIN,priority = 99)
-     public void logFail(final LoginEvent loginEvent){
-         runOnUiThread(new Runnable() {
-             @Override
-             public void run() {
-                 Toast.makeText(LoginActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-                 //登陆失败的后续处理
-                 finish();
-             }
-         });
-     }
     @Override
     public void onClick(View view) {
         MyApplication.isVisitor = false;

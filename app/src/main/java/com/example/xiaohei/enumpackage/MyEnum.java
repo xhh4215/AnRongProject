@@ -5,7 +5,7 @@ package com.example.xiaohei.enumpackage;
  */
 
 public class MyEnum {
-    /**
+    /**   向服务端发送消息的时候使用的枚举
      *  - MESSAGE_SEVERMSG 服务器的发送的消息
      *  - MESSAGE_CMDMSG 指挥端发送的消息
      *  - MESSAGE_PHONEMSG 手机端发送的消息
@@ -13,6 +13,7 @@ public class MyEnum {
     public enum MessageType {MESSAGE_SEVERMSG,MESSAGE_CMDMSG, MESSAGE_PHONEMSG}
 
     /**
+     *   向服务端发送消息的时候使用的枚举
      * - COMMAND_CONNECT_SUCESS 连接成功的指令
      * - COMMAND_BEGIN_PUSH 开始推流的指令
      * - COMMAND_END_PUSH 结束推流的指令

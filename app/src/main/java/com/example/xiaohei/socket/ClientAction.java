@@ -79,48 +79,52 @@ public class ClientAction extends Thread {
                         case EventConfig.LGOIN_SUCCESS:
                             //获取消息类型判断是服务端消息还是指挥端消息
                             type = receiveData.getMsgType();
-                            String phoneId = receiveData.getPhoneId();
-                            EventBus.getDefault().post(new LoginEvent(phoneId, type));
+                            message = receiveData.getMsgCom();
+                            //String phoneId = receiveData.getPhoneId();
+                            EventBus.getDefault().post(new LoginEvent(""+message, message));
                             //此处应该添加获取推送地址的代码
                             break;
                         //登陆失败的处理
                         case EventConfig.LOGIN_FAILE:
                             type = receiveData.getMsgType();
                             message = receiveData.getMsgCom();
-                            EventBus.getDefault().post(new LoginEvent("" + message, type));
+                            EventBus.getDefault().post(new LoginEvent("" + message, message));
                             break;
                         //视频标绘的处理
                         case EventConfig.POINT:
                             type = receiveData.getMsgType();
+                            message = receiveData.getMsgCom();
                             double onePointx = receiveData.getLPoint_x();
                             double onePointy = receiveData.getLPoint_y();
                             double twoPointx = receiveData.getRPoint_x();
                             double twoPointy = receiveData.getRPoint_y();
                             Point point = new Point(onePointx, onePointy, twoPointx, twoPointy);
-                            EventBus.getDefault().post(new InformationEvent(point, type));
+                            EventBus.getDefault().post(new InformationEvent(point, message));
                             break;
                         //闪光灯的处理
                         case EventConfig.FlASH:
                             type = receiveData.getMsgType();
-                            int open = receiveData.getMsgCom();
-                            EventBus.getDefault().post(new InformationEvent(open, type));
+                            message = receiveData.getMsgCom();
+                            EventBus.getDefault().post(new InformationEvent(type, message));
                             break;
                         //视频会商的处理
                         case EventConfig.VIDEO_DISCUSS:
                             type = receiveData.getMsgType();
+                            message = receiveData.getMsgCom();
                             String discussurl = receiveData.getDiscussUrl();
-                            EventBus.getDefault().post(new InformationEvent(discussurl, type));
+                            EventBus.getDefault().post(new InformationEvent(discussurl, message));
                         //增大焦距
                         case EventConfig.FOCUSING_UP:
                             type = receiveData.getMsgType();
                             message = receiveData.getMsgCom();
-                            EventBus.getDefault().post(new InformationEvent(message, type));
+                            //changdata = receiveData.getdata();
+                            EventBus.getDefault().post(new InformationEvent(10, message));
                             break;
                         //减小焦距
                         case EventConfig.FOCUSING_DOWN:
                             type = receiveData.getMsgType();
                             message = receiveData.getMsgCom();
-                            EventBus.getDefault().post(new InformationEvent(message, type));
+                            EventBus.getDefault().post(new InformationEvent(-10, message));
                             break;
                     }
                 } catch (Exception e) {

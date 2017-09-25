@@ -1,13 +1,12 @@
 package com.example.xiaohei.context;
-
 /**
  * Created by 栾桂明 on 2016/6/16.
  * 定义的一些常量来标识服务端返回的数据的类型
  */
 public class EventConfig {
-    public static final int LGOIN_SUCCESS = 0; //连接成功
+    public static final int LGOIN_SUCCESS =0; //连接成功
     public static final int LOGIN_FAILE = 1;//连接失败
-    public static final int BEGIN_PUSH = 2;//开始推流
+    public static final int BEGIN_PUSH =2;//开始推流
     public static final int END_PUSH =3;//结束推流
     public static final int BEGIN_PULL=4;//开始拉流
     public static final int END_PULL = 5;//结束拉流

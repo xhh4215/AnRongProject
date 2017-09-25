@@ -80,7 +80,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
      * 3: high profile
      * */
     private int sw_video_encoder_profile = 2;    //default with baseline profile
-    public int message;
+    public int servicedata;
     //视频管理的按钮
     private Button btnRecoderMgr;
     //切换摄像头的图片
@@ -98,11 +98,13 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private Camera mCamera = null;
     //进行自动对焦的监听事件
     private Camera.AutoFocusCallback myAutoFocusCallback = null;
+    private Gson gson ;
     private boolean mPreviewRunning = false;
     private boolean isStart = false;
     private boolean isPushing = false;
     private boolean isRecording = false;
     private String publishURL;
+    public int progress=100;
     private String baseURL;
     private String printText = "URL:";
     private String txt = "当前状态";
@@ -113,7 +115,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private static final int LANDSCAPE = 2;    //横屏
     private int currentOrigentation = PORTRAIT;
     private int curCameraIndex = -1;
-    private int openId = 0;
+    private int openId = 0;//标识打开闪光的变量
     private int videoWidth = 640;
     private int videoHight = 480;
     private int frameCount = 0;
@@ -126,8 +128,6 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private SeekBar btnChangeJu;//改变焦距的控件
     private String imageSavePath;
     private SketchpadView mSketchpadView;//图形绘制的控件
-    //双向视频拉取视频的地址
-    private String url1 = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
 
     static {
         System.loadLibrary("SmartPublisher");
@@ -196,6 +196,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         mSurfaceView = (SurfaceView) this.findViewById(R.id.surface);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
+        gson = getGson();
         getDataFromLogin();
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         //自动聚焦变量回调
@@ -211,7 +212,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         };
 
         libPublisher = new SmartPublisherJni();
-        player = new PlayerManager(this);
+         player = new PlayerManager(this);
 
     }
 
@@ -519,11 +520,10 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                     Log.e(TAG, "Failed to publish stream..");
                 } else {
                     btnRecoderMgr.setEnabled(false);
-                    BaseServiceData message = new BaseServiceData();
+                    BaseServiceData message = getBaseServiceDate();
                     message.setMsgCom(MyEnum.CommandType.COMMAND_BEGIN_PUSH.ordinal());
                     message.setMsgType(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
                     message.setPhoneId("startpush");
-                    Gson gson = new Gson();
                     String s = gson.toJson(message + "\n");
                     MyApplication.getmClientAction().sendData(s);
                 }
@@ -533,6 +533,11 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                 CheckInitAudioRecorder();    //enable pure video publisher..
             }
         }
+    }
+
+    public BaseServiceData getBaseServiceDate() {
+        BaseServiceData message = new BaseServiceData();
+        return message;
     }
 
     private void ConfigControlEnable(boolean isEnable) {
@@ -939,6 +944,13 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     }
 
     private void StopPublish() {
+        BaseServiceData stoppush = getBaseServiceDate();
+        stoppush.setMsgType(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
+        stoppush.setMsgCom(MyEnum.CommandType.COMMAND_END_PUSH.ordinal());
+        stoppush.setPhoneId("stoppush");
+        String s = gson.toJson(stoppush + "\n");
+        MyApplication.getmClientAction().sendData(s);
+
         if (audioRecord_ != null) {
             Log.i(TAG, "surfaceDestroyed, call StopRecording..");
             audioRecord_.StopRecording();
@@ -1087,22 +1099,22 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                             break;
                         //闪光灯的处理
                         case EventConfig.FlASH:
-                            message = (int) object;
-                            handleFlash(message, mCamera);
+                            servicedata = (int) object;
+                            handleFlash( mCamera);
                             break;
                         //焦距变化处理逻辑
                         case EventConfig.FOCUSING_DOWN:
-                            message = (int) object;
-                            handleFocusing(message,mCamera);
+                            servicedata = (int) object;
+                            handleFocusingUp(servicedata, mCamera);
                             break;
                         case EventConfig.FOCUSING_UP:
-                            message = (int) object;
-                            handleFocusing(message,mCamera);
+                            servicedata = (int) object;
+                            handleFocusingDown(servicedata, mCamera);
                             break;
                         case EventConfig.VIDEO_DISCUSS:
                             //拉取视频的url
-                            String discussUrl = (String )object;
-                            handlePlayer(discussUrl,player);
+                            String discussUrl = (String) object;
+                            handlePlayer(discussUrl, player);
                             break;
                     }
                 } catch (Exception e) {
@@ -1112,21 +1124,36 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         });
     }
-   //播放拉取的视频源
+    //减小焦距
+    private void handleFocusingDown(int message, Camera mCamera) {
+         progress = progress-10;
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setZoom(progress);
+            mCamera.setParameters(parameters);
+        }
+    //播放拉取的视频源
     private void handlePlayer(String discussUrl, PlayerManager player) {
-        player.play(discussUrl);
-    }
-
-    //message 是焦距每次变化的数值的大小
-    private void handleFocusing(int message, Camera mCamera) {
-        int progress1 = message / 10;
-        Camera.Parameters parameters = mCamera.getParameters();
-        parameters.setZoom(progress1);
-        mCamera.setParameters(parameters);
-    }
-
-    private void handleFlash(int message, Camera mCamera) {
-        if (message == MyEnum.CommandType.COMMAND_FLASHLIGHT.ordinal()) {
+            BaseServiceData startpull = getBaseServiceDate();
+            startpull.setMsgType(MyEnum.CommandType.COMMAND_BEGIN_PULL.ordinal());
+            startpull.setMsgCom(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
+            startpull.setPhoneId("startpull");
+            String s = gson.toJson(startpull + "\n");
+            MyApplication.getmClientAction().sendData(s);
+            player.play(discussUrl);
+        }
+    //增加焦距
+    private void handleFocusingUp(int message, Camera mCamera) {
+            progress = progress+10;
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setZoom(message);
+            mCamera.setParameters(parameters);
+        }
+   public  Gson getGson(){
+       Gson gson = new Gson();
+       return  gson;
+   }
+   //调节闪光灯的处理
+    private void handleFlash( Camera mCamera) {
             if (openId == 0) {
                 Camera.Parameters parameters = mCamera.getParameters();
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
@@ -1139,8 +1166,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                 openId = 0;
             }
         }
-    }
-
+    //视频标绘的处理
     private void handlePoint(Point point) {
         //获取android手机的屏幕的宽度和高度
         WindowManager wm = this.getWindowManager();
@@ -1175,7 +1201,6 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         }, 3000);
     }
-
     //activity重新回到栈顶运行的时候回调的方法
     @Override
     protected void onResume() {
@@ -1185,7 +1210,6 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             EventBus.getDefault().register(this);
         }
     }
-
     //activity处于暂停的时候的回调的方法
     @Override
     protected void onPause() {
