@@ -23,13 +23,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.LoginActivity" ></activity>
-        <activity android:name=".ui.activity.SplashActivity">
-
-        </activity>
-        <activity android:name=".ui.activity.VideoActivity">
-
-        </activity>
+        <activity android:name=".ui.activity.LoginActivity" />
+        <activity android:name=".ui.activity.SplashActivity" />
+        <activity android:name=".ui.activity.VideoActivity" />
         <activity android:name=".ui.activity.RecorderManager" />
         <activity android:name=".ui.activity.RecorderPlayback" />
         <activity android:name=".ui.activity.MainActivity">
@@ -39,6 +35,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.activity.SpdyActivity" />
+        <activity android:name=".ui.activity.PLayActivity"></activity>
     </application>
 
 </manifest>
