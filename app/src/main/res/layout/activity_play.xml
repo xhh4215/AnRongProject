@@ -6,5 +6,5 @@
     <com.example.xiaohei.player.media.IjkVideoView
         android:id="@+id/ijkPlayerId"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.example.xiaohei.player.media.IjkVideoView>
+        android:layout_height="match_parent"/>
 </LinearLayout>

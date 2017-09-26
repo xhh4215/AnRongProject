@@ -12,14 +12,14 @@ import com.example.xiaohei.R;
 public class SpdyActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     public ListView listview;
     public ArrayAdapter adapter;
-    String[] pushlist = new String[]{"rtmp://192.168.1.177:1935/live/stream1",
-            "rtmp://192.168.1.177:1935/live/stream2",
-            "rtmp://192.168.1.177:1935/live/stream3",
-            "rtmp://192.168.1.177:1935/live/stream4",
-            "rtmp://192.168.1.177:1935/live/stream5",
-            "rtmp://192.168.1.177:1935/live/stream6",
-            "rtmp://192.168.1.177:1935/live/stream7",
-            "rtmp://192.168.1.177:1935/live/stream9"};
+    String[] pushlist = new String[]{"rtmp://192.168.1.22:1935/live/stream1",
+            "rtmp://192.168.1.22:1935/live/stream2",
+            "rtmp://192.168.1.22:1935/live/stream3",
+            "rtmp://192.168.1.22:1935/live/stream4",
+            "rtmp://192.168.1.22:1935/live/stream5",
+            "rtmp://192.168.1.22:1935/live/stream6",
+            "rtmp://192.168.1.22:1935/live/stream7",
+            "rtmp://192.168.1.22:1935/live/stream8"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -141,7 +141,7 @@ public class PlayerManager {
         //设置播放的时候的屏幕的宽度
         screenWidthPixels = activity.getResources().getDisplayMetrics().widthPixels;
         //加载activity布局中的播放的控件
-        videoView = (IjkVideoView) activity.findViewById(R.id.video_view);
+        videoView = (IjkVideoView) activity.findViewById(R.id.ijkPlayerId);
         //视频播放完毕的时候的监听
         videoView.setOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
             @Override

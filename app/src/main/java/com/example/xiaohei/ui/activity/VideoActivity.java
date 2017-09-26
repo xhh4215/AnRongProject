@@ -215,6 +215,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         libPublisher = new SmartPublisherJni();
          player = new PlayerManager(this);
 
+
     }
 
     //用来处理登陆的界面传递过来的数据
