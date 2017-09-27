@@ -87,6 +87,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private ImageView imgSwitchCamera;
     //开始推流的按钮
     private Button btnStartStop;
+    private Button btnSeeVideo;
     //进行本地录制的视频的按钮
     private Button btnStartRecorder;
     private Button btnCaptureImage;
@@ -193,6 +194,8 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         btnOpenFlash = (Button) findViewById(R.id.flashid);
         btnOpenFlash.setOnClickListener(new OpenFlashListener());
         imgSwitchCamera = (ImageView) findViewById(R.id.button_switchCamera);
+        btnSeeVideo = (Button) findViewById(R.id.button_see_video);
+        btnSeeVideo.setOnClickListener(new MySeeVideoListener());
         imgSwitchCamera.setOnClickListener(new SwitchCameraListener());
         mSurfaceView = (SurfaceView) this.findViewById(R.id.surface);
         mSurfaceHolder = mSurfaceView.getHolder();
@@ -213,7 +216,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         };
 
         libPublisher = new SmartPublisherJni();
-         player = new PlayerManager(this);
+         player = new PlayerManager(this,R.id.video_view);
 
 
     }
@@ -1228,5 +1231,17 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     }
 
 
+    private class MySeeVideoListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            //此处添加发起视频调阅的请求获取正在推流的地址进行播放
+//            BaseServiceData message = getBaseServiceDate();
+//            message.setMsgCom(MyEnum.CommandType.COMMAND_BEGIN_PUSH.ordinal());//等待设置对应的命令
+//            message.setMsgType(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
+//            message.setPhoneId("seevideo");
+//            String s = gson.toJson(message + "\n");
+//            MyApplication.getmClientAction().sendData(s);
+        }
+    }
 }
 

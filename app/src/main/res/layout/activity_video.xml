@@ -43,6 +43,14 @@
                 android:background="@color/colorPrimary"
                 android:text=" 录像"
                 android:textColor="#FFFFFF" />
+            <Button
+                android:id="@+id/button_see_video"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text=" 调阅"
+                android:textColor="#FFFFFF" />
 
             <Button
                 android:id="@+id/flashid"

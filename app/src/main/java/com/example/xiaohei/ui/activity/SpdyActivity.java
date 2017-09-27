@@ -9,6 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.xiaohei.R;
+import com.example.xiaohei.event.SeeVideoEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 public class SpdyActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     public ListView listview;
     public ArrayAdapter adapter;
@@ -40,4 +46,27 @@ public class SpdyActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     }
+    //处理得到的url地址集合
+    @Subscribe(threadMode = ThreadMode.MAIN, priority = 99)
+    public void getVideoUrl(SeeVideoEvent event){
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //EventBus注册
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    //activity处于暂停的时候的回调的方法
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
 }

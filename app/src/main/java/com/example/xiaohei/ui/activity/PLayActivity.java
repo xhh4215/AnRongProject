@@ -14,7 +14,7 @@ public class PLayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-        player = new PlayerManager(this);
+        player = new PlayerManager(this,R.id.ijkPlayerId);
         player.setFullScreenOnly(true);
         player.setScaleType(PlayerManager.SCALETYPE_FILLPARENT);
         player.playInFullScreen(true);

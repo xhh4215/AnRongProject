@@ -6,6 +6,7 @@ import android.util.Log;
 import com.example.xiaohei.context.Config;
 import com.example.xiaohei.context.EventConfig;
 import com.example.xiaohei.event.InformationEvent;
+import com.example.xiaohei.event.SeeVideoEvent;
 import com.example.xiaohei.paintview.Point;
 import com.example.xiaohei.socketdata.BaseServiceData;
 import com.example.xiaohei.event.LoginEvent;
@@ -126,6 +127,11 @@ public class ClientAction extends Thread {
                             message = receiveData.getMsgCom();
                             EventBus.getDefault().post(new InformationEvent(-10, message));
                             break;
+                        case EventConfig.BEGIN_PULL:
+                            message = receiveData.getMsgCom();
+                            String url="123" ;
+                            //处理返回的json类型的url地址
+                            EventBus.getDefault().post(new SeeVideoEvent(url,message));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

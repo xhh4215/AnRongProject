@@ -129,7 +129,7 @@ public class PlayerManager {
         this.defaultRetryTime = defaultRetryTime;
     }
     //构造器的初始化
-    public PlayerManager(final Activity activity) {
+    public PlayerManager(final Activity activity,int id) {
         try {
             IjkMediaPlayer.loadLibrariesOnce(null);
             IjkMediaPlayer.native_profileBegin("libijkplayer.so");
@@ -141,7 +141,7 @@ public class PlayerManager {
         //设置播放的时候的屏幕的宽度
         screenWidthPixels = activity.getResources().getDisplayMetrics().widthPixels;
         //加载activity布局中的播放的控件
-        videoView = (IjkVideoView) activity.findViewById(R.id.ijkPlayerId);
+        videoView = (IjkVideoView) activity.findViewById(id);
         //视频播放完毕的时候的监听
         videoView.setOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
             @Override
