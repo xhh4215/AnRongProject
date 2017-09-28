@@ -59,9 +59,6 @@ public class BaseServiceData implements Serializable {
     }
 
     //是否打开闪光的标识符
-
-    //登陆的用户id
-    public String PhoneId;
     //发送的指令的类型 登陆 绘图。。。。
     public int MsgCom;
     //指明是谁发送的消息
@@ -92,16 +89,6 @@ public class BaseServiceData implements Serializable {
     public void setMsgType(int msgType) {
         MsgType = msgType;
     }
-
-    public String getPhoneId() {
-        return PhoneId;
-    }
-
-    public void setPhoneId(String phoneId) {
-        this.PhoneId = phoneId;
-    }
-
-
     public BaseServiceData() {
     }
 }

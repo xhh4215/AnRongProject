@@ -30,13 +30,11 @@ public class SketchpadView extends View implements IUndoRedoCommand {
     //设置画笔常量
     public static final int STROKE_PEN = 12;       //画笔1
     public static final int STROKE_ERASER = 2;    //橡皮擦2
-
     public static final int STROKE_RECT = 9;      //矩形 4
-
     public static final int STROKE_SPRAYGUN = 5;      //喷枪8
     public static final int UNDO_SIZE = 20;       //撤销栈的大小
-    public static final int BITMAP_WIDTH = 650;        //画布高
-    public static final int BITMAP_HEIGHT = 400;    //画布宽
+    public static final int BITMAP_WIDTH = 640;        //画布高
+    public static final int BITMAP_HEIGHT = 480;    //画布宽
     public static final int REDO = 201;  //redo
     public static final int UNDO = 202;  //undo
     public static final int CLEAR_BOARD = 203;  //清空面板
@@ -259,6 +257,7 @@ public class SketchpadView extends View implements IUndoRedoCommand {
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
+        canvas.rotate(270);
         if (null != m_bkBitmap) {
             RectF dst = new RectF(getLeft(), getTop(), getRight(), getBottom());
             Rect rst = new Rect(0, 0, m_bkBitmap.getWidth(), m_bkBitmap.getHeight());
@@ -278,8 +277,8 @@ public class SketchpadView extends View implements IUndoRedoCommand {
 
     private int oldWidth;
     private int oldHeight;
-    private final int CONFIRM_WIDGHT = 900;
-    private final int CONFIRM_HEIGHT = 900;
+    private final int CONFIRM_WIDGHT = 640;
+    private final int CONFIRM_HEIGHT = 480;
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

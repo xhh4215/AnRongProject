@@ -50,6 +50,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public Gson gson;
     //服务器返回的推送的视频的地址
     public String PushUrl;
+    //拉取媒体流数据
+    public Button btnPull;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +63,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     private void initView() {
         mLoginUrl = (ClearEditText) findViewById(R.id.login_user_edt);
-        mLoginUrl.setText("192.168.1.227");
+        mLoginUrl.setText("192.168.1.143");
         mLoginId = (ClearEditText) findViewById(R.id.login_userphoneid_edt);
         mLogin = mLoginId.getText().toString();
         mLoginBtn = ((Button) findViewById(R.id.login_btn));
+        btnPull = (Button) findViewById(R.id.pull_btn);
+        btnPull.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MyApplication.context,SpdyActivity.class);
+                startActivity(intent);
+            }
+        });
         mLoginBtn.setOnClickListener(this);
     }
 
@@ -94,7 +104,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void run() {
                 switch(loginEvent.getWhat()){
                     case EventConfig.LGOIN_SUCCESS:
-                        Toast.makeText(LoginActivity.this, "连接成功" + loginEvent.getPhoneid()+loginEvent.what+"发来的消息", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "客户端连接成功" , Toast.LENGTH_SHORT).show();
                         PushUrl = "rtmp://192.168.1.22:1935/live/stream2";
                         //登陆成功跳转到主界面
                         Intent intent = new Intent(LoginActivity.this, VideoActivity.class);
@@ -124,11 +134,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         mClientAction.start();
         //封装登陆发送的数据
         BaseServiceData sendLogon = new BaseServiceData();
-        commandType = MyEnum.CommandType.COMMAND_CLIENT_ONLINE.ordinal();
+        commandType = MyEnum.CommandType.COMMAND_CONNECT_SUCESS.ordinal();
         messageType = MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal();
         sendLogon.setMsgCom(commandType);
         sendLogon.setMsgType(messageType);
-        sendLogon.setPhoneId(mLoginId.getText().toString());
         //对象转化为json字符串
         gson = new Gson();
         final String jsonLongon = gson.toJson(sendLogon) + "\n";

@@ -87,7 +87,10 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private ImageView imgSwitchCamera;
     //开始推流的按钮
     private Button btnStartStop;
+    //视频调阅按钮 (功能暂时还未添加)
     private Button btnSeeVideo;
+    //静音按钮
+    private Button btnJy;
     //进行本地录制的视频的按钮
     private Button btnStartRecorder;
     private Button btnCaptureImage;
@@ -99,13 +102,12 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private Camera mCamera = null;
     //进行自动对焦的监听事件
     private Camera.AutoFocusCallback myAutoFocusCallback = null;
-    private Gson gson ;
     private boolean mPreviewRunning = false;
     private boolean isStart = false;
     private boolean isPushing = false;
     private boolean isRecording = false;
     private String publishURL;
-    public int progress=100;
+    public int progress = 100;
     private String baseURL;
     private String printText = "URL:";
     private String txt = "当前状态";
@@ -114,7 +116,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private int currentCameraType = BACK;    //当前打开的摄像头标记
     private static final int PORTRAIT = 1;    //竖屏
     private static final int LANDSCAPE = 2;    //横屏
-    private int currentOrigentation = PORTRAIT;
+    private int currentOrigentation = LANDSCAPE;
     private int curCameraIndex = -1;
     private int openId = 0;//标识打开闪光的变量
     private int videoWidth = 640;
@@ -197,10 +199,16 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         btnSeeVideo = (Button) findViewById(R.id.button_see_video);
         btnSeeVideo.setOnClickListener(new MySeeVideoListener());
         imgSwitchCamera.setOnClickListener(new SwitchCameraListener());
+        btnJy = (Button) findViewById(R.id.button_jingyin);
+        btnJy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSketchpadView.clearAllStrokes();
+            }
+        });
         mSurfaceView = (SurfaceView) this.findViewById(R.id.surface);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
-        gson = getGson();
         getDataFromLogin();
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         //自动聚焦变量回调
@@ -216,7 +224,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         };
 
         libPublisher = new SmartPublisherJni();
-         player = new PlayerManager(this,R.id.video_view);
+        player = new PlayerManager(this, R.id.video_view);
 
 
     }
@@ -515,23 +523,17 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                 //libPublisher.SmartPublisherSetSWVideoBitRate(600, 1200);
                 // IF not set url or url is empty, it will not publish stream
                 // if ( libPublisher.SmartPublisherSetURL("") != 0 )
-                if (libPublisher.SmartPublisherSetURL(publishURL) != 0) {
-                    Log.e(TAG, "Failed to set publish stream URL..");
-                    Toast.makeText(myContext, "推流失败", Toast.LENGTH_SHORT).show();
-                }
 
-                int isStarted = libPublisher.SmartPublisherStart();
-                if (isStarted != 0) {
-                    Log.e(TAG, "Failed to publish stream..");
-                } else {
-                    btnRecoderMgr.setEnabled(false);
-                    BaseServiceData message = getBaseServiceDate();
-                    message.setMsgCom(MyEnum.CommandType.COMMAND_BEGIN_PUSH.ordinal());
-                    message.setMsgType(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
-                    message.setPhoneId("startpush");
-                    String s = gson.toJson(message + "\n");
-                    MyApplication.getmClientAction().sendData(s);
-                }
+
+                btnRecoderMgr.setEnabled(false);
+                BaseServiceData message = getBaseServiceDate();
+                message.setMsgCom(MyEnum.CommandType.COMMAND_BEGIN_PUSH.ordinal());
+                message.setMsgType(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
+                Gson gson = new Gson();
+                String s = gson.toJson(message) + "\n";
+                MyApplication.getmClientAction().sendData(s);
+
+
             }
 
             if (pushType == 0 || pushType == 1) {
@@ -952,7 +954,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         BaseServiceData stoppush = getBaseServiceDate();
         stoppush.setMsgType(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
         stoppush.setMsgCom(MyEnum.CommandType.COMMAND_END_PUSH.ordinal());
-        stoppush.setPhoneId("stoppush");
+        Gson gson = new Gson();
         String s = gson.toJson(stoppush + "\n");
         MyApplication.getmClientAction().sendData(s);
 
@@ -1083,12 +1085,12 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         int perm = context.checkCallingOrSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE");
         return perm == 0;
     }
-
+    //对绘图的自定义的view的相关的设置
     private static void setSketchpadView(SketchpadView sketchpadView) {
         sketchpadView.setStrokeType(SketchpadView.STROKE_RECT);
         sketchpadView.setStrokeColor(Color.RED);
     }
-
+    //对socket返回的数据进行处理的方法
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 99)
     public void onPaint(final InformationEvent event) {
         runOnUiThread(new Runnable() {
@@ -1101,11 +1103,12 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                         case EventConfig.POINT:
                             Point point = (Point) object;
                             handlePoint(point);
+                            handleClear();
                             break;
                         //闪光灯的处理
                         case EventConfig.FlASH:
                             servicedata = (int) object;
-                            handleFlash( mCamera);
+                            handleFlash(mCamera);
                             break;
                         //焦距变化处理逻辑
                         case EventConfig.FOCUSING_DOWN:
@@ -1121,6 +1124,10 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                             String discussUrl = (String) object;
                             handlePlayer(discussUrl, player);
                             break;
+                        case EventConfig.BEGIN_PUSH:
+                            String message = (String) object;
+                            handlePush(message);
+                            break;
                     }
                 } catch (Exception e) {
                     LogUtils.e(TAG, "handle board event fail");
@@ -1129,68 +1136,8 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         });
     }
-    //减小焦距
-    private void handleFocusingDown(int message, Camera mCamera) {
-         progress = progress-10;
-            Camera.Parameters parameters = mCamera.getParameters();
-            parameters.setZoom(progress);
-            mCamera.setParameters(parameters);
-        }
-
-
-    //播放拉取的视频源
-    private void handlePlayer(String discussUrl, PlayerManager player) {
-            BaseServiceData startpull = getBaseServiceDate();
-            startpull.setMsgType(MyEnum.CommandType.COMMAND_BEGIN_PULL.ordinal());
-            startpull.setMsgCom(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
-            startpull.setPhoneId("startpull");
-            String s = gson.toJson(startpull + "\n");
-            MyApplication.getmClientAction().sendData(s);
-            player.play(discussUrl);
-        }
-
-
-    //增加焦距
-    private void handleFocusingUp(int message, Camera mCamera) {
-            progress = progress+10;
-            Camera.Parameters parameters = mCamera.getParameters();
-            parameters.setZoom(message);
-            mCamera.setParameters(parameters);
-        }
-
-   public  Gson getGson(){
-       Gson gson = new Gson();
-       return  gson;
-   }
-   //调节闪光灯的处理
-    private void handleFlash( Camera mCamera) {
-            if (openId == 0) {
-                Camera.Parameters parameters = mCamera.getParameters();
-                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                mCamera.setParameters(parameters);
-                openId = 1;
-            } else {
-                Camera.Parameters parameters = mCamera.getParameters();
-                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                mCamera.setParameters(parameters);
-                openId = 0;
-            }
-        }
-    private void handlePoint(Point point) {
-        //获取android手机的屏幕的宽度和高度
-        WindowManager wm = this.getWindowManager();
-        int width = wm.getDefaultDisplay().getWidth();
-        int height = wm.getDefaultDisplay().getHeight();
-        double onePointx = point.getX1();
-        double onePointy = point.getY1();
-        double twoPointx = point.getX2();
-        double twoPointy = point.getY2();
-        int x1 = (new Double(width * onePointx)).intValue();
-        int y1 = (new Double(height * onePointy)).intValue();
-        int x2 = (new Double(width * twoPointx)).intValue();
-        int y2 = (new Double(height * twoPointy)).intValue();
-        mSketchpadView.action_down(x1, y1);
-        mSketchpadView.action_up(x2, y2);
+    //清除标绘的图形
+    private void handleClear() {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -1210,7 +1157,86 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         }, 3000);
     }
+    //判断服务端是不是可以进行视频推流
+    private void handlePush(String message) {
+        Toast.makeText(myContext, message, Toast.LENGTH_SHORT).show();
+        if (libPublisher.SmartPublisherSetURL(publishURL) != 0) {
 
+            Log.e(TAG, "Failed to set publish stream URL..");
+            Toast.makeText(myContext, "推流失败", Toast.LENGTH_SHORT).show();
+        }
+        int isStarted = libPublisher.SmartPublisherStart();
+        if (isStarted != 0) {
+            Log.e(TAG, "Failed to publish stream..");
+        } else {
+            Toast.makeText(myContext, "推流失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //减小焦距
+    private void handleFocusingDown(int message, Camera mCamera) {
+        progress = progress - 10;
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setZoom(progress);
+        mCamera.setParameters(parameters);
+    }
+    //播放拉取的视频源
+    private void handlePlayer(String discussUrl, PlayerManager player) {
+        BaseServiceData startpull = getBaseServiceDate();
+        startpull.setMsgType(MyEnum.CommandType.COMMAND_BEGIN_PULL.ordinal());
+        startpull.setMsgCom(MyEnum.MessageType.MESSAGE_PHONEMSG.ordinal());
+        Gson gson = new Gson();
+        String s = gson.toJson(startpull + "\n");
+        MyApplication.getmClientAction().sendData(s);
+        player.play(discussUrl);
+    }
+    //增加焦距
+    private void handleFocusingUp(int message, Camera mCamera) {
+        progress = progress + 10;
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setZoom(message);
+        mCamera.setParameters(parameters);
+    }
+    //调节闪光灯的处理
+    private void handleFlash(Camera mCamera) {
+        if (openId == 0) {
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            mCamera.setParameters(parameters);
+            openId = 1;
+        } else {
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            mCamera.setParameters(parameters);
+            openId = 0;
+        }
+    }
+    //视频标绘的处理
+    private void handlePoint(Point point) {
+        //获取android手机的屏幕的宽度和高度
+//        WindowManager wm = this.getWindowManager();
+//        int width = wm.getDefaultDisplay().getWidth();
+//        int height = wm.getDefaultDisplay().getHeight();
+        int width = mSurfaceView.getWidth();
+        int height = mSurfaceView.getHeight();
+        double onePointx = point.getX1();
+        double onePointy = point.getY1();
+        double twoPointx = point.getX2();
+        double twoPointy = point.getY2();
+        double xxPoint = 2 * (width * onePointx);
+        double xxxPoint = 640 - xxPoint;
+        double xxxxPoint = 640 - xxxPoint;
+        int x1 = new Double(xxxxPoint).intValue();
+//        int x1 = (new Double(width * onePointx)).intValue();
+        int y1 = (new Double(height * onePointy)).intValue();
+        double xxPoint2 = width * twoPointx * 2;
+        double xxxPoint2 = 640 - xxPoint2;
+        double xxxxPoint2 = 640 - xxxPoint2;
+        int x2 = (new Double(xxxxPoint2)).intValue();
+//        int x2 = (new Double(width * twoPointx)).intValue();
+        int y2 = (new Double(height * twoPointy)).intValue();
+        mSketchpadView.action_down(x1, y1);
+        mSketchpadView.action_up(x2, y2);
+    }
     //activity重新回到栈顶运行的时候回调的方法
     @Override
     protected void onResume() {
@@ -1220,7 +1246,6 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             EventBus.getDefault().register(this);
         }
     }
-
     //activity处于暂停的时候的回调的方法
     @Override
     protected void onPause() {
@@ -1229,8 +1254,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             EventBus.getDefault().unregister(this);
         }
     }
-
-
+    //视频调阅的功能的实现
     private class MySeeVideoListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {

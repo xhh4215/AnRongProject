@@ -81,10 +81,10 @@ public class ClientAction extends Thread {
                             //获取消息类型判断是服务端消息还是指挥端消息
                             type = receiveData.getMsgType();
                             message = receiveData.getMsgCom();
-                            //String phoneId = receiveData.getPhoneId();
-                            EventBus.getDefault().post(new LoginEvent(""+message, message));
+                            EventBus.getDefault().post(new LoginEvent("客户端登陆成功", message));
                             //此处应该添加获取推送地址的代码
                             break;
+
                         //登陆失败的处理
                         case EventConfig.LOGIN_FAILE:
                             type = receiveData.getMsgType();
@@ -101,6 +101,10 @@ public class ClientAction extends Thread {
                             double twoPointy = receiveData.getRPoint_y();
                             Point point = new Point(onePointx, onePointy, twoPointx, twoPointy);
                             EventBus.getDefault().post(new InformationEvent(point, message));
+                            break;
+                        case EventConfig.BEGIN_PUSH:
+                            message = receiveData.getMsgCom();
+                            EventBus.getDefault().post(new InformationEvent("推流成功",message));
                             break;
                         //闪光灯的处理
                         case EventConfig.FlASH:

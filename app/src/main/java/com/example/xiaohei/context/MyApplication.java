@@ -19,7 +19,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
-        mClientAction = new ClientAction("192.168.1.227");
+        mClientAction = new ClientAction("192.168.1.143");
     }
 
         /**
