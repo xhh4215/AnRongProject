@@ -119,6 +119,8 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
     private int currentOrigentation = LANDSCAPE;
     private int curCameraIndex = -1;
     private int openId = 0;//标识打开闪光的变量
+    private int windowHeight;
+    private int windowWidth;
     private int videoWidth = 640;
     private int videoHight = 480;
     private int frameCount = 0;
@@ -186,6 +188,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         btnRecoderMgr = (Button) findViewById(R.id.button_recoder_manage);
         btnRecoderMgr.setOnClickListener(new ButtonRecorderMangerListener());
         btnStartStop = (Button) findViewById(R.id.button_start_stop);
+
         btnStartStop.setOnClickListener(new ButtonStartListener());
         btnStartRecorder = (Button) findViewById(R.id.button_start_recorder);
         btnStartRecorder.setOnClickListener(new ButtonStartRecorderListener());
@@ -225,6 +228,11 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
 
         libPublisher = new SmartPublisherJni();
         player = new PlayerManager(this, R.id.video_view);
+        WindowManager wm = this.getWindowManager();
+        windowWidth = wm.getDefaultDisplay().getWidth();
+        windowHeight = wm.getDefaultDisplay().getHeight();
+        //720 1184
+        Toast.makeText(myContext, "" + windowWidth + windowHeight, Toast.LENGTH_SHORT).show();
 
 
     }
@@ -474,8 +482,13 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
                 } else if (pushType == 2) {
                     audio_opt = 0;
                 }
-
-                libPublisher.SmartPublisherInit(myContext, audio_opt, video_opt, videoWidth, videoHight);
+                //1 代表竖屏推送  2 代表横屏推送
+                if (currentOrigentation == 2) {
+                    //widht 采集的数据的宽度   height 采集的数据的高度
+                    libPublisher.SmartPublisherInit(myContext, audio_opt, video_opt, videoWidth, videoHight);
+                } else if (currentOrigentation == 1) {
+                    libPublisher.SmartPublisherInit(myContext, audio_opt, video_opt, videoHight, videoWidth);
+                }
 
                 if (is_hardware_encoder) {
                     int hwHWKbps = setHardwareEncoderKbps(videoWidth, videoHight);
@@ -1085,11 +1098,14 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         int perm = context.checkCallingOrSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE");
         return perm == 0;
     }
-    //对绘图的自定义的view的相关的设置
+
+    //对绘图的自定义的view的
     private static void setSketchpadView(SketchpadView sketchpadView) {
         sketchpadView.setStrokeType(SketchpadView.STROKE_RECT);
+        sketchpadView.setStrokeSize(3);
         sketchpadView.setStrokeColor(Color.RED);
     }
+
     //对socket返回的数据进行处理的方法
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 99)
     public void onPaint(final InformationEvent event) {
@@ -1136,6 +1152,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         });
     }
+
     //清除标绘的图形
     private void handleClear() {
         timer.schedule(new TimerTask() {
@@ -1157,6 +1174,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             }
         }, 3000);
     }
+
     //判断服务端是不是可以进行视频推流
     private void handlePush(String message) {
         Toast.makeText(myContext, message, Toast.LENGTH_SHORT).show();
@@ -1172,6 +1190,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             Toast.makeText(myContext, "推流失败", Toast.LENGTH_SHORT).show();
         }
     }
+
     //减小焦距
     private void handleFocusingDown(int message, Camera mCamera) {
         progress = progress - 10;
@@ -1179,6 +1198,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         parameters.setZoom(progress);
         mCamera.setParameters(parameters);
     }
+
     //播放拉取的视频源
     private void handlePlayer(String discussUrl, PlayerManager player) {
         BaseServiceData startpull = getBaseServiceDate();
@@ -1189,6 +1209,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         MyApplication.getmClientAction().sendData(s);
         player.play(discussUrl);
     }
+
     //增加焦距
     private void handleFocusingUp(int message, Camera mCamera) {
         progress = progress + 10;
@@ -1196,6 +1217,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
         parameters.setZoom(message);
         mCamera.setParameters(parameters);
     }
+
     //调节闪光灯的处理
     private void handleFlash(Camera mCamera) {
         if (openId == 0) {
@@ -1210,33 +1232,24 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             openId = 0;
         }
     }
+
     //视频标绘的处理
     private void handlePoint(Point point) {
         //获取android手机的屏幕的宽度和高度
-//        WindowManager wm = this.getWindowManager();
-//        int width = wm.getDefaultDisplay().getWidth();
-//        int height = wm.getDefaultDisplay().getHeight();
-        int width = mSurfaceView.getWidth();
-        int height = mSurfaceView.getHeight();
+        int width = mSketchpadView.getWidth();
+        int height = mSketchpadView.getHeight();
         double onePointx = point.getX1();
         double onePointy = point.getY1();
         double twoPointx = point.getX2();
         double twoPointy = point.getY2();
-        double xxPoint = 2 * (width * onePointx);
-        double xxxPoint = 640 - xxPoint;
-        double xxxxPoint = 640 - xxxPoint;
-        int x1 = new Double(xxxxPoint).intValue();
-//        int x1 = (new Double(width * onePointx)).intValue();
+        int x1 = (new Double(width * onePointx)).intValue();
         int y1 = (new Double(height * onePointy)).intValue();
-        double xxPoint2 = width * twoPointx * 2;
-        double xxxPoint2 = 640 - xxPoint2;
-        double xxxxPoint2 = 640 - xxxPoint2;
-        int x2 = (new Double(xxxxPoint2)).intValue();
-//        int x2 = (new Double(width * twoPointx)).intValue();
+        int x2 = (new Double(width * twoPointx)).intValue();
         int y2 = (new Double(height * twoPointy)).intValue();
-        mSketchpadView.action_down(x1, y1);
-        mSketchpadView.action_up(x2, y2);
+        mSketchpadView.action_down(height - y1, x1);
+        mSketchpadView.action_up(height - y2, x2);
     }
+
     //activity重新回到栈顶运行的时候回调的方法
     @Override
     protected void onResume() {
@@ -1246,6 +1259,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             EventBus.getDefault().register(this);
         }
     }
+
     //activity处于暂停的时候的回调的方法
     @Override
     protected void onPause() {
@@ -1254,6 +1268,7 @@ public class VideoActivity extends Activity implements SurfaceHolder.Callback, C
             EventBus.getDefault().unregister(this);
         }
     }
+
     //视频调阅的功能的实现
     private class MySeeVideoListener implements View.OnClickListener {
         @Override

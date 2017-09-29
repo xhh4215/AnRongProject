@@ -14,27 +14,19 @@
         <android.view.SurfaceView
             android:id="@+id/surface"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/drawviewid"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_gravity="center" />
+            android:layout_height="485dp"
+            />
 
         <com.example.xiaohei.ui.view.SketchpadView
             android:id="@+id/drawviewid"
-            android:layout_width="640dp"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/linearLayout"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_alignParentBottom="true"
             android:background="@color/colorPrimary"
             android:orientation="horizontal">
@@ -42,7 +34,7 @@
             <Button
                 android:id="@+id/button_start_recorder"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="85dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
                 android:text=" 录像"
@@ -50,7 +42,7 @@
             <Button
                 android:id="@+id/button_see_video"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="85dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
                 android:text=" 调阅"
@@ -59,7 +51,7 @@
             <Button
                 android:id="@+id/flashid"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="85dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
                 android:text="闪光"
@@ -68,7 +60,7 @@
             <Button
                 android:id="@+id/button_start_stop"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="85dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
@@ -79,7 +71,7 @@
             <Button
                 android:id="@+id/button_recoder_manage"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="85dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
                 android:text="视频"
@@ -89,7 +81,7 @@
             <Button
                 android:id="@+id/button_capture_image"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="85dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
                 android:text=" 快照"
@@ -99,10 +91,10 @@
             <Button
                 android:id="@+id/button_jingyin"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="85dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
-                android:text="清除标绘"
+                android:text="清除"
                 android:textColor="#FFFFFF" />
 
         </LinearLayout>
@@ -112,6 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_above="@+id/linearLayout"
+            android:layout_alignBottom="@+id/surface"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 

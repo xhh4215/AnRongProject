@@ -257,7 +257,6 @@ public class SketchpadView extends View implements IUndoRedoCommand {
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
-        canvas.rotate(270);
         if (null != m_bkBitmap) {
             RectF dst = new RectF(getLeft(), getTop(), getRight(), getBottom());
             Rect rst = new Rect(0, 0, m_bkBitmap.getWidth(), m_bkBitmap.getHeight());
@@ -277,8 +276,8 @@ public class SketchpadView extends View implements IUndoRedoCommand {
 
     private int oldWidth;
     private int oldHeight;
-    private final int CONFIRM_WIDGHT = 640;
-    private final int CONFIRM_HEIGHT = 480;
+    private final int CONFIRM_WIDGHT = 780;
+    private final int CONFIRM_HEIGHT = 800;
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -286,7 +285,7 @@ public class SketchpadView extends View implements IUndoRedoCommand {
         int h = MeasureSpec.getSize(heightMeasureSpec);
         //取得view原始宽高
         oldWidth = w>oldWidth ? w : oldWidth;
-        oldHeight = h>oldHeight ? h: oldHeight;
+        oldHeight =950;
         setMeasuredDimension(CONFIRM_WIDGHT,CONFIRM_HEIGHT);
     }
 
@@ -310,27 +309,27 @@ public class SketchpadView extends View implements IUndoRedoCommand {
         m_isSetForeBmp = false;
     }
 //
-//    public boolean onTouchEvent(MotionEvent event) {
-//        // TODO Auto-generated method stub
-//        int x = (int) event.getX();
-//        int y = (int) event.getY();
-//        if (m_isEnableDraw)   //判断是否可绘图
-//        {
-//            m_isTouchUp = false;
-//            switch (event.getAction()) {
-//                case MotionEvent.ACTION_DOWN:
-//                   action_down(x,y);
-//                    break;
-//               case MotionEvent.ACTION_MOVE:
-//                  action_move(x,y);
-//                   break;
-//                case MotionEvent.ACTION_UP:
-//                   action_up(x,y);
-//                    break;
-//            }
-//        }
-//        return true;
-//   }
+    public boolean onTouchEvent(MotionEvent event) {
+        // TODO Auto-generated method stub
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        if (m_isEnableDraw)   //判断是否可绘图
+        {
+            m_isTouchUp = false;
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                   action_down(x,y);
+                    break;
+               case MotionEvent.ACTION_MOVE:
+                  action_move(x,y);
+                   break;
+                case MotionEvent.ACTION_UP:
+                   action_up(x,y);
+                    break;
+            }
+        }
+        return true;
+   }
     public void action_down(int x,int y) {
         //根据m_strokeType进行重新生成对象且记录下操作对象
         setStrokeType(m_strokeType);
